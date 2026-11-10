@@ -5,101 +5,101 @@ use Slim\Psr7\Factory\ServerRequestFactory;
 
 class financeiro_tests extends TestCase
 {
-    public function testPostCriaProduto(): void
+    public function test_post_criaCategoria(): void
     {
         $app = require __DIR__ . '/../src/app.php'; // retorna $app sem chamar ->run()
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/produtos')->withHeader('Content-Type', 'application/json');
-        $request->getBody()->write(json_encode(['nome' => 'Mouse']));
+        $request = (new ServerRequestFactory())->createServerRequest('POST', '/categorias')->withHeader('Content-Type', 'application/json');
+        $request->getBody()->write(json_encode(['nome' => $dados['nome'], 'tipo' => $dados['tipo']]));
         $request->getBody()->rewind();
         $response = $app->handle($request);
         $this->assertEquals(201, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Mouse', $corpo['nome']);
+        $this->assertEquals($categorias['id'], $corpo['nome']);
+        $this->assertEquals($dados['nome'], $corpo['nome']);
+        $this->assertEquals($dados['tipo'], $corpo['tipo']);
     }
      
-    public function testPostCriaProdutoComErro(): void
+    public function test_post_criaCategoriaComErro(): void
     {
         $app = require __DIR__ . '/../src/app.php';
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/produtos')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('POST', '/categorias')->withHeader('Content-Type', 'application/json');
         $request->getBody()->write(json_encode([]));
         $request->getBody()->rewind();
         $response = $app->handle($request);
         $this->assertEquals(400, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('O nome é obrigatório', $corpo['erro']);
+        $this->assertEquals('Todos os campos precisam estar preenchidos.', $corpo['erro']);
     }
 
 
 
-    public function testGetProdutoPorId(): void
+    public function test_get_CategoriaPorId(): void
     {
         $app = require __DIR__ . '/../src/app.php';
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/produtos/1')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/categorias/{id}')->withHeader('Content-Type', 'application/json');
         $response = $app->handle($request);
         $this->assertEquals(200, $response->getStatusCode());
-        // $corpo = json_decode((string) $response->getBody(), true);
-        // $this->assertEquals('O nome é obrigatório', $corpo['erro']);
     }
 
-    public function testGetProdutoPorIdInexistente(): void
+    public function test_get_CategoriaPorIdInexistente(): void
     {
         $app = require __DIR__ . '/../src/app.php';
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/produtos/999')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/categorias/{id}')->withHeader('Content-Type', 'application/json');
         $response = $app->handle($request);
         $this->assertEquals(404, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Produto não encontrado', $corpo['erro']);
+        $this->assertEquals('Categoria não encontrada.', $corpo['erro']);
     }
 
 
 
-    public function testDeleteProdutoPorId(): void
+    public function test_delete_CategoriaPorId(): void
     {
         $app = require __DIR__ . '/../src/app.php';
-        $request = (new ServerRequestFactory())->createServerRequest('DELETE', '/produtos/1')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('DELETE', '/categorias/{id}')->withHeader('Content-Type', 'application/json');
         $response = $app->handle($request);
         $this->assertEquals(200, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Produto removido com sucesso', $corpo['mensagem']);
+        $this->assertEquals('Categoria removida com sucesso.', $corpo['mensagem']);
     }
 
-    public function testDeleteProdutoPorIdInexistente(): void
+    public function test_delete_CategoriaPorIdInexistente(): void
     {
         $app = require __DIR__ . '/../src/app.php';
-        $request = (new ServerRequestFactory())->createServerRequest('DELETE', '/produtos/999')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('DELETE', '/categorias/{id}')->withHeader('Content-Type', 'application/json');
         $response = $app->handle($request);
         $this->assertEquals(404, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Produto não encontrado', $corpo['erro']);
+        $this->assertEquals('Categoria não encontrada.', $corpo['erro']);
     }
 
 
 
-    public function testPutProdutoPorId(): void
+    public function test_put_CategoriaPorId(): void
     {
         $app = require __DIR__ . '/../src/app.php';
-        $request = (new ServerRequestFactory())->createServerRequest('PUT', '/produtos/1')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('PUT', '/categorias/{id}')->withHeader('Content-Type', 'application/json');
         $request->getBody()->write(json_encode(['nome' => 'Teclado atualizado']));
         $request->getBody()->rewind();
         $response = $app->handle($request);
         $this->assertEquals(200, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Produto atualizado com sucesso', $corpo['mensagem']);
-        $requestAtualizado = (new ServerRequestFactory())->createServerRequest('GET', '/produtos/1');
+        $this->assertEquals('categoria atualizado com sucesso', $corpo['mensagem']);
+        $requestAtualizado = (new ServerRequestFactory())->createServerRequest('GET', '/categorias/{id}');
         $responseAtualizado = $app->handle($requestAtualizado);
-        $produtoAtualizado = json_decode((string) $responseAtualizado->getBody(), true);
-        $this->assertEquals('Teclado atualizado', $produtoAtualizado['nome']);
+        $categoriaAtualizado = json_decode((string) $responseAtualizado->getBody(), true);
+        $this->assertEquals('Teclado atualizado', $categoriaAtualizado['nome']);
     }
 
-    public function testputProdutoPorIdinexistente(): void
+    public function test_put_CategoriaPorIdinexistente(): void
     {
         $app = require __DIR__ . '/../src/app.php'; // retorna $app sem chamar ->run()
-        $request = (new ServerRequestFactory())->createServerRequest('PUT', '/produtos/999')->withHeader('Content-Type', 'application/json');
+        $request = (new ServerRequestFactory())->createServerRequest('PUT', '/categorias/{id}')->withHeader('Content-Type', 'application/json');
         $request->getBody()->write(json_encode(['nome' => 'Teclado atualizado']));
         $request->getBody()->rewind();
         $response = $app->handle($request);
         $this->assertEquals(404, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Produto não encontrado', $corpo['erro']);
+        $this->assertEquals('categoria não encontrado', $corpo['erro']);
     }
 }
