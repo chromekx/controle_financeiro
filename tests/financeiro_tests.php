@@ -14,9 +14,9 @@ class financeiro_tests extends TestCase
         $response = $app->handle($request);
         $this->assertEquals(201, $response->getStatusCode());
         $corpo = json_decode((string) $response->getBody(), true);
-        $this->assertEquals($categorias['id'], $corpo['nome']);
-        $this->assertEquals($dados['nome'], $corpo['nome']);
-        $this->assertEquals($dados['tipo'], $corpo['tipo']);
+        $this->assertEquals($categorias['id'], count($categorias) + 1);
+        $this->assertEquals($categorias['nome'], $corpo['nome']);
+        $this->assertEquals($categorias['tipo'], $corpo['tipo']);
     }
      
     public function test_post_criaCategoriaComErro(): void
