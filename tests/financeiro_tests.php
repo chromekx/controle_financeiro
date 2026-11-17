@@ -6,36 +6,36 @@ use Slim\Psr7\Factory\ServerRequestFactory;
 
 class financeiro_tests extends TestCase
 {
-    // Testa se uma categoria é cadastrada corretamente (POST)
+    // testa se uma categoria foi cadastrada corretamente
     public function test_post_criaCategoria(): void
     {
-        // Carrega a aplicação Slim sem iniciar o servidor
+        // carrega a aplicacao slim sem iniciar o servidor
         $app = require __DIR__ . '/../src/app.php';
 
-        // Cria uma requisição POST para cadastrar uma categoria
+        // cria uma requisiçao post para cadastrar uma categoria
         $request = (new ServerRequestFactory())
             ->createServerRequest('POST', '/categorias')
             ->withHeader('Content-Type', 'application/json');
 
-        // Envia os dados da nova categoria em formato JSON
+        // Envia os dados da nova categoria em formato json
         $request->getBody()->write(json_encode([
             'nome' => 'Transporte',
             'tipo' => 'Despesa'
         ]));
 
-        // Retorna o cursor do corpo da requisição para o início
+        // retorna o cursor do corpo da requisicao para o inicio
         $request->getBody()->rewind();
 
-        // Executa a requisição na aplicação
+        // executa a requisicao na aplicacao
         $response = $app->handle($request);
 
-        // Verifica se o cadastro retornou o status 201 (criado)
+        // verifica se o cadastro retornou o status 201 (criado)
         $this->assertEquals(201, $response->getStatusCode());
 
-        // Converte a resposta JSON em um array PHP
+        // converte a resposta json em um array php
         $corpo = json_decode((string) $response->getBody(), true);
 
-        // Verifica se os dados retornados são os esperados
+        // verifica se os dados retornados sao os esperados
         $this->assertEquals(13, $corpo['id_categoria']);
         $this->assertEquals('Transporte', $corpo['nome']);
         $this->assertEquals('Despesa', $corpo['tipo']);
@@ -46,7 +46,7 @@ class financeiro_tests extends TestCase
     {
         $app = require __DIR__ . '/../src/app.php';
 
-        // Cria uma requisição POST sem enviar nenhum campo
+        // cria uma requisicao post sem enviar nenhum campo
         $request = (new ServerRequestFactory())
             ->createServerRequest('POST', '/categorias')
             ->withHeader('Content-Type', 'application/json');
@@ -56,10 +56,10 @@ class financeiro_tests extends TestCase
 
         $response = $app->handle($request);
 
-        // Verifica se a API retornou 400 (requisição inválida)
+        // verifica se a api retornou 400 (requisicao invalida)
         $this->assertEquals(400, $response->getStatusCode());
 
-        // Converte a resposta para verificar a mensagem de erro
+        // converte a resposta para verificar a mensagem de erro
         $corpo = json_decode((string) $response->getBody(), true);
 
         $this->assertEquals(
@@ -74,16 +74,16 @@ class financeiro_tests extends TestCase
     {
         $app = require __DIR__ . '/../src/app.php';
 
-        // Cria uma requisição GET para buscar a categoria de ID 1
+        // cria uma requisicao get para buscar a categoria de id 1
         $request = (new ServerRequestFactory())
             ->createServerRequest('GET', '/categorias/1');
 
         $response = $app->handle($request);
 
-        // Verifica se a busca foi realizada com sucesso
+        // verifica se a busca foi realizada com sucesso
         $this->assertEquals(200, $response->getStatusCode());
 
-        // Converte a resposta JSON em um array PHP
+        // converte a resposta json em um array PHP
         $corpo = json_decode((string) $response->getBody(), true);
 
         // Verifica se os dados da categoria estão corretos
@@ -102,10 +102,10 @@ class financeiro_tests extends TestCase
 
         $response = $app->handle($request);
 
-        // Verifica se a API retornou 404 (não encontrado)
+        // Verifica se a api retornou 404 (não encontrado)
         $this->assertEquals(404, $response->getStatusCode());
 
-        // Verifica se a mensagem de erro está correta
+        // Verifica se a mensagem de erro ta correta
         $corpo = json_decode((string) $response->getBody(), true);
 
         $this->assertEquals(
@@ -120,7 +120,7 @@ class financeiro_tests extends TestCase
     {
         $app = require __DIR__ . '/../src/app.php';
 
-        // Cria uma requisição DELETE para excluir a categoria de ID 1
+        // Cria uma requisicao DELETE para excluir a categoria de ID 1
         $request = (new ServerRequestFactory())
             ->createServerRequest('DELETE', '/categorias/1');
 
@@ -129,7 +129,7 @@ class financeiro_tests extends TestCase
         // Verifica se a exclusão retornou 204 (sem conteúdo)
         $this->assertEquals(204, $response->getStatusCode());
 
-        // Realiza outra requisição GET para verificar se a categoria foi excluída
+        // Realiza outra requisicao GET para verificar se a categoria foi excluída
         $requestVerificacao = (new ServerRequestFactory())
             ->createServerRequest('GET', '/categorias/1');
 
@@ -150,7 +150,7 @@ class financeiro_tests extends TestCase
 
         $response = $app->handle($request);
 
-        // Verifica se a API retornou 404 (não encontrado)
+        // Verifica se a api retornou 404 (não encontrado)
         $this->assertEquals(404, $response->getStatusCode());
 
         // Verifica a mensagem de erro retornada
@@ -168,12 +168,12 @@ class financeiro_tests extends TestCase
     {
         $app = require __DIR__ . '/../src/app.php';
 
-        // Cria uma requisição PUT para atualizar a categoria de ID 1
+        // cria uma requisiçao put para atualizar a categoria de id 1
         $request = (new ServerRequestFactory())
             ->createServerRequest('PUT', '/categorias/1')
             ->withHeader('Content-Type', 'application/json');
 
-        // Envia os novos dados da categoria em formato JSON
+        // envia os novos dados da categoria em formato json
         $request->getBody()->write(json_encode([
             'nome' => 'Mercado atualizado',
             'tipo' => 'Despesa'
@@ -183,29 +183,29 @@ class financeiro_tests extends TestCase
 
         $response = $app->handle($request);
 
-        // Verifica se a atualização foi realizada com sucesso
+        // verifica se a atualização foi realizada com sucesso
         $this->assertEquals(200, $response->getStatusCode());
 
-        // Converte a resposta para um array PHP
+        // converte a resposta para um array php
         $corpo = json_decode((string) $response->getBody(), true);
 
-        // Verifica se os dados retornados correspondem aos novos valores
+        // verifica se os dados retornados correspondem aos novos valores
         $this->assertEquals('Mercado atualizado', $corpo['nome']);
         $this->assertEquals('Despesa', $corpo['tipo']);
 
-        // Faz uma nova requisição GET para conferir se a atualização foi salva
+        // Faz uma nova requisicao get para conferir se a atualizaçao foi salva
         $requestAtualizado = (new ServerRequestFactory())
             ->createServerRequest('GET', '/categorias/1');
 
         $responseAtualizado = $app->handle($requestAtualizado);
 
-        // Converte a resposta da nova consulta em um array PHP
+        // converte a resposta da nova consulta em um array php
         $categoriaAtualizada = json_decode(
             (string) $responseAtualizado->getBody(),
             true
         );
 
-        // Confirma se o nome atualizado foi retornado
+        // confirma se o nome atualizado foi retornado
         $this->assertEquals(
             'Mercado atualizado',
             $categoriaAtualizada['nome']
@@ -217,12 +217,12 @@ class financeiro_tests extends TestCase
     {
         $app = require __DIR__ . '/../src/app.php';
 
-        // Cria uma requisição PUT para um ID que não existe
+        // cria uma requisicao put para um id que nao existe
         $request = (new ServerRequestFactory())
             ->createServerRequest('PUT', '/categorias/999')
             ->withHeader('Content-Type', 'application/json');
 
-        // Envia os dados que seriam utilizados na atualização
+        // envia os dados que seriam utilizados na atualizaçao
         $request->getBody()->write(json_encode([
             'nome' => 'Categoria atualizada',
             'tipo' => 'Despesa'
@@ -232,10 +232,10 @@ class financeiro_tests extends TestCase
 
         $response = $app->handle($request);
 
-        // Verifica se a API retornou 404 (não encontrado)
+        // verifica se a api retornou 404 (nao encontrado)
         $this->assertEquals(404, $response->getStatusCode());
 
-        // Verifica se a mensagem de erro está correta
+        // verifica se a mensagem de erro ta correta
         $corpo = json_decode((string) $response->getBody(), true);
 
         $this->assertEquals(

@@ -35,7 +35,7 @@ $app->get('/categorias', function ($request, $response, $args) use (&$categorias
             ->withStatus(404);
     }
 
-    // Missões encontradas
+    // missoes encontradas
     $response->getBody()->write(json_encode($categorias));
     return $response
         ->withHeader('Content-Type', 'application/json')
@@ -53,7 +53,7 @@ $app->get('/categorias/{id}', function ($request, $response, $args) use (&$categ
             ->withStatus(404);
     }
 
-    // missão encontrada
+    // missaso encontrada
     $response->getBody()->write(json_encode($categoria));
     return $response
         ->withHeader('Content-Type', 'application/json')
@@ -61,9 +61,9 @@ $app->get('/categorias/{id}', function ($request, $response, $args) use (&$categ
 });
 
 $app->post('/categorias', function ($request, $response) use (&$categorias) {
-    // Recebe os dados enviados em JSON
+    // recebe os dados enviados em json
     $dados = $request->getParsedBody();
-    // Verifica se o nome foi informado
+    // verifica se o nome foi informado
     if (!isset($dados['nome']) || empty($dados['nome']) || !isset($dados['tipo']) || empty($dados['tipo'])) {
         $response->getBody()->write(json_encode(['erro' => 'Todos os campos precisam estar preenchidos.']));
         return $response
@@ -78,15 +78,15 @@ $app->post('/categorias', function ($request, $response) use (&$categorias) {
             ->withStatus(400);
     }
 
-    // Cria uma nova categoria
+    // cria uma nova categoria
     $novaCategoria = [
         'id' => count($categorias) + 1,
         'nome' => $dados['nome'],
         'tipo' => $dados['tipo']
     ];
-    // Adiciona a missão ao array
+    // adiciona a missao ao array
     $categorias[] = $novaCategoria;
-    // Retorna a missão criada
+    // retorna a missao criada
     $response->getBody()->write(
         json_encode($novaCategoria)
     );
@@ -171,7 +171,7 @@ $app->get('/lancamentos', function ($request, $response, $args) use (&$lancament
             ->withStatus(404);
     }
 
-    // Missões encontradas
+    // missoes encontradas
     $response->getBody()->write(json_encode($lancamentos));
     return $response
         ->withHeader('Content-Type', 'application/json')
@@ -189,7 +189,7 @@ $app->get('/lancamentos/{id}', function ($request, $response, $args) use (&$lanc
             ->withStatus(404);
     }
 
-    // missão encontrada
+    // missao encontrada
     $response->getBody()->write(json_encode($lancamento));
     return $response
         ->withHeader('Content-Type', 'application/json')
@@ -197,9 +197,9 @@ $app->get('/lancamentos/{id}', function ($request, $response, $args) use (&$lanc
 });
 
 $app->post('/lancamentos', function ($request, $response, $categorias) use (&$lancamentos) {
-    // Recebe os dados enviados em JSON
+    // recebe os dados enviados em json
     $dados = $request->getParsedBody();
-    // Verifica se o nome foi informado
+    // verifica se o nome foi informado
     if (!isset($dados['descricao']) || empty($dados['descricao']) || 
         !isset($dados['valor']) || empty($dados['valor']) ||
         !isset($dados['data']) || empty($dados['data']) ||
@@ -225,15 +225,15 @@ $app->post('/lancamentos', function ($request, $response, $categorias) use (&$la
             ->withStatus(400);
     }
 
-    // Cria uma nova lancamento
+    // cria uma nova lancamento
     $novalancamento = [
         'id' => count($lancamentos) + 1,
         'nome' => $dados['nome'],
         'tipo' => $dados['tipo']
     ];
-    // Adiciona a missão ao array
+    // adiciona a missao ao array
     $lancamentos[] = $novalancamento;
-    // Retorna a missão criada
+    // retorna a missao criada
     $response->getBody()->write(
         json_encode($novalancamento)
     );
