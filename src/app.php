@@ -196,7 +196,7 @@ $app->get('/lancamentos/{id}', function ($request, $response, $args) use (&$lanc
         ->withStatus(200);
 });
 
-$app->post('/lancamentos', function ($request, $response) use (&$lancamentos) {
+$app->post('/lancamentos', function ($request, $response, $categorias) use (&$lancamentos) {
     // Recebe os dados enviados em JSON
     $dados = $request->getParsedBody();
     // Verifica se o nome foi informado
