@@ -4,7 +4,7 @@
 use PHPUnit\Framework\TestCase;
 use Slim\Psr7\Factory\ServerRequestFactory;
 
-class financeiro_tests extends TestCase
+class FinanceiroTest extends TestCase // tem que ter aquele modelo de nome exato, PalavraTest
 {
     public function test_post_criaCategoria(): void
     {
