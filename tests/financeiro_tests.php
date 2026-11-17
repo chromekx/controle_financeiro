@@ -6,241 +6,260 @@ use Slim\Psr7\Factory\ServerRequestFactory;
 
 class financeiro_tests extends TestCase
 {
-    // testa se uma categoria foi cadastrada corretamente
     public function test_post_criaCategoria(): void
     {
-        // carrega a aplicacao slim sem iniciar o servidor
-        $app = require __DIR__ . '/../src/app.php';
-
-        // cria uma requisiçao post para cadastrar uma categoria
+        $app = require __DIR__ . '/../src/app.php'; // carrega a aplicacao slim
         $request = (new ServerRequestFactory())
             ->createServerRequest('POST', '/categorias')
             ->withHeader('Content-Type', 'application/json');
-
-        // Envia os dados da nova categoria em formato json
-        $request->getBody()->write(json_encode([
+        $request->getBody()->write(json_encode([ // envia os dados da nova categoria
             'nome' => 'Transporte',
             'tipo' => 'Despesa'
         ]));
-
-        // retorna o cursor do corpo da requisicao para o inicio
         $request->getBody()->rewind();
-
-        // executa a requisicao na aplicacao
         $response = $app->handle($request);
-
-        // verifica se o cadastro retornou o status 201 (criado)
-        $this->assertEquals(201, $response->getStatusCode());
-
-        // converte a resposta json em um array php
+        $this->assertEquals(201, $response->getStatusCode()); // verifica se a categoria foi criada
         $corpo = json_decode((string) $response->getBody(), true);
-
-        // verifica se os dados retornados sao os esperados
         $this->assertEquals(13, $corpo['id_categoria']);
         $this->assertEquals('Transporte', $corpo['nome']);
         $this->assertEquals('Despesa', $corpo['tipo']);
     }
 
-
     public function test_post_criaCategoriaComErro(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // cria uma requisicao post sem enviar nenhum campo
+        $app = require __DIR__ . '/../src/app.php'; // carrega a aplicacao para testar um cadastro invalido
         $request = (new ServerRequestFactory())
             ->createServerRequest('POST', '/categorias')
             ->withHeader('Content-Type', 'application/json');
-
         $request->getBody()->write(json_encode([]));
         $request->getBody()->rewind();
-
         $response = $app->handle($request);
-
-        // verifica se a api retornou 400 (requisicao invalida)
-        $this->assertEquals(400, $response->getStatusCode());
-
-        // converte a resposta para verificar a mensagem de erro
+        $this->assertEquals(400, $response->getStatusCode()); // verifica se a api retornou erro
         $corpo = json_decode((string) $response->getBody(), true);
-
-        $this->assertEquals(
-            'Todos os campos precisam estar preenchidos.',
-            $corpo['erro']
-        );
+        $this->assertEquals('Todos os campos precisam estar preenchidos.', $corpo['erro']);
     }
-
-
 
     public function test_get_CategoriaPorId(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // cria uma requisicao get para buscar a categoria de id 1
+        $app = require __DIR__ . '/../src/app.php'; // busca uma categoria pelo id
         $request = (new ServerRequestFactory())
             ->createServerRequest('GET', '/categorias/1');
-
         $response = $app->handle($request);
-
-        // verifica se a busca foi realizada com sucesso
-        $this->assertEquals(200, $response->getStatusCode());
-
-        // converte a resposta json em um array PHP
+        $this->assertEquals(200, $response->getStatusCode()); // verifica se a busca foi realizada
         $corpo = json_decode((string) $response->getBody(), true);
-
-        // Verifica se os dados da categoria estão corretos
         $this->assertEquals(1, $corpo['id_categoria']);
         $this->assertEquals('Mercado', $corpo['nome']);
     }
 
-
     public function test_get_CategoriaPorIdInexistente(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // Busca uma categoria utilizando um ID que não existe
+        $app = require __DIR__ . '/../src/app.php'; // busca uma categoria com id inexistente
         $request = (new ServerRequestFactory())
             ->createServerRequest('GET', '/categorias/999');
-
         $response = $app->handle($request);
-
-        // Verifica se a api retornou 404 (não encontrado)
-        $this->assertEquals(404, $response->getStatusCode());
-
-        // Verifica se a mensagem de erro ta correta
+        $this->assertEquals(404, $response->getStatusCode()); // verifica se a api retornou nao encontrado
         $corpo = json_decode((string) $response->getBody(), true);
-
-        $this->assertEquals(
-            'Categoria não encontrada.',
-            $corpo['erro']
-        );
+        $this->assertEquals('Categoria não encontrada.', $corpo['erro']);
     }
-
-
 
     public function test_delete_CategoriaPorId(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // Cria uma requisicao DELETE para excluir a categoria de ID 1
+        $app = require __DIR__ . '/../src/app.php'; // exclui a categoria de id 1
         $request = (new ServerRequestFactory())
             ->createServerRequest('DELETE', '/categorias/1');
-
         $response = $app->handle($request);
-
-        // Verifica se a exclusão retornou 204 (sem conteúdo)
-        $this->assertEquals(204, $response->getStatusCode());
-
-        // Realiza outra requisicao GET para verificar se a categoria foi excluída
-        $requestVerificacao = (new ServerRequestFactory())
+        $this->assertEquals(204, $response->getStatusCode()); // verifica se a exclusao foi realizada
+        $requestVerificacao = (new ServerRequestFactory()) // busca novamente a categoria para confirmar a exclusao
             ->createServerRequest('GET', '/categorias/1');
-
         $responseVerificacao = $app->handle($requestVerificacao);
-
-        // Verifica se a categoria não foi mais encontrada
         $this->assertEquals(404, $responseVerificacao->getStatusCode());
     }
 
-
     public function test_delete_CategoriaPorIdInexistente(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // Tenta excluir uma categoria utilizando um ID inexistente
+        $app = require __DIR__ . '/../src/app.php'; // tenta excluir uma categoria com id inexistente
         $request = (new ServerRequestFactory())
             ->createServerRequest('DELETE', '/categorias/999');
-
         $response = $app->handle($request);
-
-        // Verifica se a api retornou 404 (não encontrado)
-        $this->assertEquals(404, $response->getStatusCode());
-
-        // Verifica a mensagem de erro retornada
+        $this->assertEquals(404, $response->getStatusCode()); // verifica se a api retornou nao encontrado
         $corpo = json_decode((string) $response->getBody(), true);
-
-        $this->assertEquals(
-            'Categoria não encontrada.',
-            $corpo['erro']
-        );
+        $this->assertEquals('Categoria não encontrada.', $corpo['erro']);
     }
-
-
 
     public function test_put_CategoriaPorId(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // cria uma requisiçao put para atualizar a categoria de id 1
+        $app = require __DIR__ . '/../src/app.php'; // atualiza os dados da categoria de id 1
         $request = (new ServerRequestFactory())
             ->createServerRequest('PUT', '/categorias/1')
             ->withHeader('Content-Type', 'application/json');
-
-        // envia os novos dados da categoria em formato json
-        $request->getBody()->write(json_encode([
+        $request->getBody()->write(json_encode([ // envia os novos dados da categoria
             'nome' => 'Mercado atualizado',
             'tipo' => 'Despesa'
         ]));
-
         $request->getBody()->rewind();
-
         $response = $app->handle($request);
-
-        // verifica se a atualização foi realizada com sucesso
-        $this->assertEquals(200, $response->getStatusCode());
-
-        // converte a resposta para um array php
+        $this->assertEquals(200, $response->getStatusCode()); // verifica se a atualizacao foi realizada
         $corpo = json_decode((string) $response->getBody(), true);
-
-        // verifica se os dados retornados correspondem aos novos valores
         $this->assertEquals('Mercado atualizado', $corpo['nome']);
         $this->assertEquals('Despesa', $corpo['tipo']);
-
-        // Faz uma nova requisicao get para conferir se a atualizaçao foi salva
-        $requestAtualizado = (new ServerRequestFactory())
+        $requestAtualizado = (new ServerRequestFactory()) // consulta novamente a categoria atualizada
             ->createServerRequest('GET', '/categorias/1');
-
         $responseAtualizado = $app->handle($requestAtualizado);
-
-        // converte a resposta da nova consulta em um array php
-        $categoriaAtualizada = json_decode(
-            (string) $responseAtualizado->getBody(),
-            true
-        );
-
-        // confirma se o nome atualizado foi retornado
-        $this->assertEquals(
-            'Mercado atualizado',
-            $categoriaAtualizada['nome']
-        );
+        $categoriaAtualizada = json_decode((string) $responseAtualizado->getBody(), true);
+        $this->assertEquals('Mercado atualizado', $categoriaAtualizada['nome']);
     }
-
 
     public function test_put_CategoriaPorIdInexistente(): void
     {
-        $app = require __DIR__ . '/../src/app.php';
-
-        // cria uma requisicao put para um id que nao existe
+        $app = require __DIR__ . '/../src/app.php'; // tenta atualizar uma categoria com id inexistente
         $request = (new ServerRequestFactory())
             ->createServerRequest('PUT', '/categorias/999')
             ->withHeader('Content-Type', 'application/json');
-
-        // envia os dados que seriam utilizados na atualizaçao
         $request->getBody()->write(json_encode([
             'nome' => 'Categoria atualizada',
             'tipo' => 'Despesa'
         ]));
-
         $request->getBody()->rewind();
-
         $response = $app->handle($request);
-
-        // verifica se a api retornou 404 (nao encontrado)
-        $this->assertEquals(404, $response->getStatusCode());
-
-        // verifica se a mensagem de erro ta correta
+        $this->assertEquals(404, $response->getStatusCode()); // verifica se a api retornou nao encontrado
         $corpo = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Categoria não encontrada.', $corpo['erro']);
+    }
 
-        $this->assertEquals(
-            'Categoria não encontrada.',
-            $corpo['erro']
-        );
+    public function test_get_Lancamentos(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // busca todos os lancamentos cadastrados
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('GET', '/lancamentos');
+        $response = $app->handle($request);
+        $this->assertEquals(200, $response->getStatusCode()); // verifica se a consulta foi realizada
+        $corpo = json_decode((string) $response->getBody(), true);
+        $this->assertIsArray($corpo);
+    }
+
+    public function test_get_LancamentoPorId(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // busca um lancamento pelo id
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('GET', '/lancamentos/1');
+        $response = $app->handle($request);
+        $this->assertEquals(200, $response->getStatusCode()); // verifica se o lancamento foi encontrado
+        $corpo = json_decode((string) $response->getBody(), true);
+        $this->assertEquals(1, $corpo['id_lancamento']);
+    }
+
+    public function test_get_LancamentoPorIdInexistente(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // busca um lancamento com id inexistente
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('GET', '/lancamentos/999');
+        $response = $app->handle($request);
+        $this->assertEquals(404, $response->getStatusCode()); // verifica se a api retornou nao encontrado
+    }
+
+    public function test_get_TotalLancamentos(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // consulta os totais de receitas, despesas e saldo
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('GET', '/lancamentos/total');
+        $response = $app->handle($request);
+        $this->assertEquals(200, $response->getStatusCode()); // verifica se a consulta foi realizada
+        $corpo = json_decode((string) $response->getBody(), true);
+        $this->assertArrayHasKey('total_receitas', $corpo);
+        $this->assertArrayHasKey('total_despesas', $corpo);
+        $this->assertArrayHasKey('saldo', $corpo);
+    }
+
+    public function test_post_criaLancamento(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // cadastra um novo lancamento
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('POST', '/lancamentos')
+            ->withHeader('Content-Type', 'application/json');
+        $request->getBody()->write(json_encode([ // envia os dados do lancamento
+            'descricao' => 'Passagem de ônibus',
+            'valor' => 5.50,
+            'data' => '2026-11-17',
+            'tipo' => 'Despesa',
+            'id_categoria' => 1
+        ]));
+        $request->getBody()->rewind();
+        $response = $app->handle($request);
+        $this->assertEquals(201, $response->getStatusCode()); // verifica se o lancamento foi criado
+        $corpo = json_decode((string) $response->getBody(), true);
+        $this->assertEquals(8, $corpo['id_lancamento']);
+        $this->assertEquals('Passagem de ônibus', $corpo['descricao']);
+    }
+
+    public function test_post_criaLancamentoComErro(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // tenta cadastrar um lancamento sem preencher os campos
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('POST', '/lancamentos')
+            ->withHeader('Content-Type', 'application/json');
+        $request->getBody()->write(json_encode([]));
+        $request->getBody()->rewind();
+        $response = $app->handle($request);
+        $this->assertEquals(400, $response->getStatusCode()); // verifica se a api retornou erro
+    }
+
+    public function test_put_LancamentoPorId(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // atualiza os dados do lancamento de id 1
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('PUT', '/lancamentos/1')
+            ->withHeader('Content-Type', 'application/json');
+        $request->getBody()->write(json_encode([ // envia os novos dados do lancamento
+            'descricao' => 'Assinatura atualizada',
+            'valor' => 39.90,
+            'data' => '2026-11-17',
+            'tipo' => 'Despesa',
+            'id_categoria' => 1
+        ]));
+        $request->getBody()->rewind();
+        $response = $app->handle($request);
+        $this->assertEquals(200, $response->getStatusCode()); // verifica se a atualizacao foi realizada
+        $corpo = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Assinatura atualizada', $corpo['descricao']);
+    }
+
+    public function test_put_LancamentoPorIdInexistente(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // tenta atualizar um lancamento com id inexistente
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('PUT', '/lancamentos/999')
+            ->withHeader('Content-Type', 'application/json');
+        $request->getBody()->write(json_encode([
+            'descricao' => 'Lancamento atualizado',
+            'valor' => 20.00,
+            'data' => '2026-11-17',
+            'tipo' => 'Despesa',
+            'id_categoria' => 1
+        ]));
+        $request->getBody()->rewind();
+        $response = $app->handle($request);
+        $this->assertEquals(404, $response->getStatusCode()); // verifica se a api retornou nao encontrado
+    }
+
+    public function test_delete_LancamentoPorId(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // exclui o lancamento de id 1
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('DELETE', '/lancamentos/1');
+        $response = $app->handle($request);
+        $this->assertEquals(204, $response->getStatusCode()); // verifica se a exclusao foi realizada
+        $requestVerificacao = (new ServerRequestFactory()) // consulta novamente o lancamento para confirmar a exclusao
+            ->createServerRequest('GET', '/lancamentos/1');
+        $responseVerificacao = $app->handle($requestVerificacao);
+        $this->assertEquals(404, $responseVerificacao->getStatusCode());
+    }
+
+    public function test_delete_LancamentoPorIdInexistente(): void
+    {
+        $app = require __DIR__ . '/../src/app.php'; // tenta excluir um lancamento com id inexistente
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('DELETE', '/lancamentos/999');
+        $response = $app->handle($request);
+        $this->assertEquals(404, $response->getStatusCode()); // verifica se a api retornou nao encontrado
     }
 }
